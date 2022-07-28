@@ -41,6 +41,7 @@ struct Config
 
   // wifi
   bool WifiEnableAp;    // true to run as access point
+  bool WifiEnable;
   String WifiSsid;      // wifi access point name
   String WifiKey;       // wifi access point key
 

@@ -1,3 +1,17 @@
+// Copyright 2019 Ian Archbell / oddWires
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "ble_serial.h"
 
 class BLESerialServerCallbacks: public BLEServerCallbacks {
@@ -74,7 +88,7 @@ bool BLESerial::begin(const char* localName)
 
     BLECharacteristic * pRxCharacteristic = pService->createCharacteristic(
                                                 CHARACTERISTIC_UUID_RX,
-                                                BLECharacteristic::PROPERTY_WRITE
+                                                BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_WRITE_NR
                                             );
     if (pRxCharacteristic == nullptr)
         return false; 
@@ -85,7 +99,7 @@ bool BLESerial::begin(const char* localName)
 
     // Start the service
     pService->start();
-    LOG_INFO("BLE starting service");
+    LOG_INFO("BLE started service");
 
     // Start advertising
     pServer->getAdvertising()->addServiceUUID(pService->getUUID()); 
@@ -93,7 +107,7 @@ bool BLESerial::begin(const char* localName)
     pServer->getAdvertising()->setMinPreferred(0x06);
     pServer->getAdvertising()->setMaxPreferred(0x12);
     pServer->getAdvertising()->start();
-    LOG_INFO("BLE is waiting a client connection to notify...");
+    LOG_INFO("BLE started advertising and waiting for client connection...");
     return true;
 }
 

@@ -130,21 +130,26 @@ void Service::setupWifi(const String &wifiName, const String &wifiKey)
 
   // Client/STA mode
   } else {
-    LOG_INFO("WIFI connecting to", wifiName);
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(wifiName.c_str(), wifiKey.c_str());
-  
-    int retryCnt = 0;
-    while (WiFi.status() != WL_CONNECTED) {
-      delay(CfgConnRetryMs);
-      LOG_WARN("WIFI retrying", retryCnt);
-      if (retryCnt++ >= CfgConnRetryMaxTimes) {
-        LOG_ERROR("WIFI connect failed");
-        return;
+    if (config_.WifiEnable) {
+      LOG_INFO("Wifi is Enable.");
+      LOG_INFO("WIFI connecting to", wifiName);
+      WiFi.mode(WIFI_STA);
+      WiFi.begin(wifiName.c_str(), wifiKey.c_str());
+    
+      int retryCnt = 0;
+      while (WiFi.status() != WL_CONNECTED) {
+        delay(CfgConnRetryMs);
+        LOG_INFO("WIFI retrying", retryCnt);
+        if (retryCnt++ >= CfgConnRetryMaxTimes) {
+          LOG_ERROR("WIFI connect failed");
+          return;
+        }
       }
+      LOG_INFO("WIFI connected to", wifiName);
+      LOG_INFO("IP address:", WiFi.localIP());
+    }else {
+      LOG_INFO("Wifi is Disable.");
     }
-    LOG_INFO("WIFI connected to", wifiName);
-    LOG_INFO("IP address:", WiFi.localIP());
   }
   // Run KISS server if enabled
   if (config_.KissEnableTcpIp) {
@@ -197,6 +202,7 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
 {
   isImplicitHeaderMode_ = !isExplicit;
   isImplicitHeaderMode_ = sf == 6;      // must be implicit for SF6
+  int loraSpeed = (int)(sf * (4.0 / cr) / (pow(2.0, sf) / bw));
         
   LOG_INFO("Initializing LoRa");
   LOG_INFO("Frequency:", loraFreq, "Hz");
@@ -207,7 +213,9 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   LOG_INFO("Sync:", "0x" + String(sync, HEX));
   LOG_INFO("CRC:", crcBytes);
   LOG_INFO("Header:", isImplicitHeaderMode_ ? "implicit" : "explicit");
-  LOG_INFO("Speed:", (int)(sf * (4.0 / cr) / (pow(2.0, sf) / bw)), "bps");
+  LOG_INFO("Speed:", loraSpeed, "bps");
+  LOG_INFO("TOA (compressed):", 37.0 / ((double)loraSpeed / 8.0), "sec");
+  LOG_INFO("TOA (uncompressed):", 64.0 / ((double)loraSpeed / 8.0), "sec");
   float snrLimit = -7;
   switch (sf) {
     case 7:
@@ -232,7 +240,10 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   LOG_INFO("Min level:", -174 + 10 * log10(bw) + 6 + snrLimit, "dBm");
 
 #ifdef USE_RADIOLIB
-  radio_ = std::make_shared<MODULE_NAME>(new Module(config_.LoraPinSs, config_.LoraPinA, config_.LoraPinRst, config_.LoraPinB));
+  SPIClass * hspi = new SPIClass(HSPI);
+  radio_ = std::make_shared<MODULE_NAME>(new Module(15, 33, 23, 39, *hspi));
+  hspi->begin();
+  //radio_->setCurrentLimit(140);
   int state = radio_->begin((float)loraFreq / 1e6, (float)bw / 1e3, sf, cr, sync, pwr);
   if (state != ERR_NONE) {
     LOG_ERROR("Radio start error:", state);
@@ -632,9 +643,11 @@ void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLen
     memcpy(buf, packet, cpySize);
     buf[cpySize-1] = '\0';
     payload = AX25::Payload(String((char*)buf));
+    //LOG_INFO("DEBUG USE 3");
   }
 
   if (payload.IsValid()) {
+    //LOG_INFO("DEBUG USE 4");
 
 #ifdef USE_RADIOLIB
     float snr = radio_->getSNR();
@@ -664,6 +677,7 @@ void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLen
     
     String textPayload = payload.ToString(config_.EnableSignalReport ? signalReport : String());
     LOG_INFO(textPayload);
+   // LOG_INFO("DEBUG USE 1");
 
     if (config_.EnableRfToIs) {
       sendToAprsis(textPayload);
@@ -672,12 +686,13 @@ void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLen
     if (config_.EnableRepeater && payload.Digirepeat(ownCallsign_)) {
       sendAX25ToLora(payload);
       LOG_INFO("Packet digirepeated");
+      //LOG_INFO(payload);
+    //  LOG_INFO("DEBUG USE 2");
     }
   } else {
     LOG_WARN("Skipping non-AX25 payload");
   }
 }
-
 bool Service::onRigTxBegin()
 {
   if (splitEnabled()) {

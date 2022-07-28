@@ -68,6 +68,7 @@ String Callsign::ToString() const
   if (ssid_ != 0) {
     result += "-" + String(ssid_);
   }
+  //Serial.print(result);
   return result;
 }
 
@@ -76,7 +77,9 @@ bool Callsign::Digirepeat()
   if (IsPath()) {
     if (ssid_ > 0) {
       if (--ssid_ == 0) {
-        call_ += "*";
+        //call_ += "*";
+        call_ = "BX4ACP-3*,WIDE1*";
+        Serial.print(call_);
       }
       return true;
     }

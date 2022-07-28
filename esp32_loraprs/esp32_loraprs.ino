@@ -46,8 +46,8 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.LoraPinRst = CFG_LORA_PIN_RST;
   cfg.LoraPinA = CFG_LORA_PIN_A; // (sx127x - dio0, sx126x/sx128x - dio1)
   cfg.LoraPinB = CFG_LORA_PIN_B; // (sx127x - dio1, sx126x/sx128x - busy)
-  cfg.LoraPinSwitchRx = CFG_LORA_PIN_RXEN;  // (sx127x - unused, sx126x - RXEN pin number)
-  cfg.LoraPinSwitchTx = CFG_LORA_PIN_TXEN;  // (sx127x - unused, sx126x - TXEN pin number)
+  cfg.LoraPinSwitchRx = 2;  // (sx127x - unused, sx126x - RXEN pin number)
+  cfg.LoraPinSwitchTx = 4;  // (sx127x - unused, sx126x - TXEN pin number)
   cfg.LoraUseIsr = CFG_LORA_USE_ISR;  // set to true for incoming packet ISR usage (stream mode, e.g. speech)
   cfg.LoraUseCad = CFG_LORA_USE_CAD;  // carrier detect
 
@@ -71,6 +71,7 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.WifiEnableAp = CFG_WIFI_ENABLE_AP;
   cfg.WifiSsid = CFG_WIFI_SSID;
   cfg.WifiKey = CFG_WIFI_KEY;
+  cfg.WifiEnable = CFG_WIFI_ENABLE;
 
   // frequency correction
   cfg.EnableAutoFreqCorrection = CFG_FREQ_CORR;  // automatic tune to any incoming packet frequency
