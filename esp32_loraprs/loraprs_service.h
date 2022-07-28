@@ -21,8 +21,8 @@
 #include <WiFi.h>
 #include <endian.h>
 
-#include "BluetoothSerial.h"
-#include "ble_serial.h"
+//#include "BluetoothSerial.h"
+//#include "ble_serial.h"
 #include "ax25_payload.h"
 #include "kiss_processor.h"
 #include "loraprs_config.h"
@@ -43,7 +43,7 @@ private:
   void setupWifi(const String &wifiName, const String &wifiKey);
   void setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int sync, int crcBytes, bool isExplicit);
   void setupFreq(long loraFreq) const;
-  void setupBt(const String &btName);
+  //void setupBt(const String &btName);
 
   void reconnectWifi() const;
   bool reconnectAprsis();
@@ -157,8 +157,8 @@ private:
   CircularBuffer<uint8_t, CfgMaxPacketSize> txQueue_;
   static std::shared_ptr<MODULE_NAME> radio_;
 #endif
-  BluetoothSerial serialBt_;
-  BLESerial serialBLE_;
+//  BluetoothSerial serialBt_;
+// BLESerial serialBLE_;
   WiFiClient aprsisConn_;
   
   std::shared_ptr<WiFiServer> kissServer_;

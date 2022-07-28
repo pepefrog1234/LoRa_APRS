@@ -18,8 +18,6 @@ Service::Service()
   , csmaP_(CfgCsmaPersistence)
   , csmaSlotTime_(CfgCsmaSlotTimeMs)
   , csmaSlotTimePrev_(0)
-  , serialBt_()
-  , serialBLE_()
   , kissServer_(new WiFiServer(CfgKissPort))
   , isKissConn_(false)
 {
@@ -83,9 +81,9 @@ void Service::setup(const Config &conf)
   }
   
   // peripherals, Bluetooth/BLE
-  if (needsBt()) {
-    setupBt(config_.BtName);
-  }
+  //if (needsBt()) {
+  //  setupBt(config_.BtName);
+ // }
 
   // APRS-IS
   if (needsAprsis() && config_.EnablePersistentAprsConnection) {
@@ -302,7 +300,7 @@ void Service::setupLora(long loraFreq, long bw, int sf, int cr, int pwr, int syn
   LOG_INFO("LoRa initialized");
 }
 
-void Service::setupBt(const String &btName)
+/*void Service::setupBt(const String &btName)
 {
   String btType = config_.BtEnableBle ? "BLE" : "BT";
   LOG_INFO(btType, "init", btName);
@@ -318,7 +316,7 @@ void Service::setupBt(const String &btName)
     LOG_ERROR(btType, "failed");
   }
 }
-
+*/
 void Service::loop()
 { 
   if (needsWifi() && WiFi.status() != WL_CONNECTED) {
@@ -776,12 +774,12 @@ void Service::onSerialTx(byte b)
   else if (isKissConn_) {
     kissConn_.write(b);
   }
-  else if (config_.BtEnableBle) {
-    serialBLE_.write(b);
-  }
-  else {
-    serialBt_.write(b);
-  }
+//  else if (config_.BtEnableBle) {
+//    serialBLE_.write(b);
+//  }
+//  else {
+//    serialBt_.write(b);
+//  }
 }
 
 bool Service::onSerialRxHasData()
@@ -792,12 +790,13 @@ bool Service::onSerialRxHasData()
   else if (isKissConn_) {
     return kissConn_.available();
   }
-  else if (config_.BtEnableBle) {
-    return serialBLE_.available();
-  }
-  else {
-    return serialBt_.available();
-  }
+  return 0;
+//  else if (config_.BtEnableBle) {
+//    return serialBLE_.available();
+//  }
+//  else {
+//    return serialBt_.available();
+//  }
 }
 
 bool Service::onSerialRx(byte *b)
@@ -816,15 +815,15 @@ bool Service::onSerialRx(byte *b)
     }
   }
   else {
-    rxResult = config_.BtEnableBle 
-      ? serialBLE_.read() 
-      : serialBt_.read();
+   // rxResult = config_.BtEnableBle 
+   //   ? serialBLE_.read() 
+   //   : serialBt_.read();
   }
   if (rxResult == -1) {
     return false;
   }
-  *b = (byte)rxResult;
-  LOG_TRACE((char)rxResult, String(rxResult, HEX));
+ //  b = (byte)rxResult;
+  //LOG_TRACE((char)rxResult, String(rxResult, HEX));
   return true;
 }
 

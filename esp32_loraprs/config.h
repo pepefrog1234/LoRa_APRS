@@ -10,7 +10,7 @@
 #else
 #define MODULE_NAME   SX1278
 #endif
-//TEST 123
+
 // generic options
 #define LED_TOGGLE_PERIOD     1000    // heartbeat LED period
 #define SERIAL_BAUD_RATE      115200  // USB serial baud rate
@@ -88,25 +88,20 @@
 #define CFG_KISS_TCP_IP       false   // true - run as KISS TCP/IP server, no bluetooth operations performed
 
 // APRS-IS options, valid in when CFG_IS_CLIENT_MODE = false
-#define CFG_APRS_LOGIN        "BX4ACP"
+#define CFG_APRS_LOGIN        "BX4ACP-1"
 #define CFG_APRS_PASS         "18091"
 #define CFG_APRS_FILTER	      "r/24.11/120.42/50"  // multiple are space separated, see http://www.aprs-is.net/javAPRSFilter.aspx
-#define CFG_APRS_RAW_BKN    "BX4ACP>APZMDM,WIDE1-1:=2410.70NL12043.00E&LoRA 430.64MHz/BW125/SF12/CR8/0x12"
+#define CFG_APRS_RAW_BKN    "BX4ACP-1>APZMDM,WIDE1-1:=2410.90NL12045.00E&LoRA 430.64MHz/BW125/SF12/CR8/0x12"//測試參數
 //#define CFG_APRS_RAW_BKN      "BM2OBM-18>OBM2BM,WIDE1-1:=2335.06NL12037.14E&TMMARC https://www.tmmarc.org [LoRa APRS iGate 430.640MHz]"
 
 //#define CFG_APRS_LOGIN        "BM2OBM-18"
 //#define CFG_APRS_PASS         "16813"
 //#define CFG_APRS_FILTER        "r/24.11/120.42/50"  // multiple are space separated, see http://www.aprs-is.net/javAPRSFilter.aspx
-//#define CFG_APRS_RAW_BKN    "BX4ACP>APZMDM,WIDE1-1:!2410.70N/12043.00E#LoRA 430.64MHz/BW125/SF12/CR8/0x12"
+//#define CFG_APRS_RAW_BKN    "BX4ACP>APZMDM,WIDE1-1:!2410.70N/12043.00E#LoRA 430.64MHz/BW125/SF12/CR8/0x12" 正式參數
 //#define CFG_APRS_RAW_BKN      "BM2OBM-18>OBM2BM,WIDE1-1:=2335.06NL12037.14E&TMMARC https://www.tmmarc.org [LoRa APRS iGate 430.640MHz]"
-//2445.84NL12058.12E&LoRA 430.64MHz/BW125/SF12/CR8/0x12
-//#define CFG_APRS_LOGIN        "BX4ACP-2"
-//#define CFG_APRS_PASS         "18091"
-//#define CFG_APRS_FILTER        "r/24.11/120.42/50"  // multiple are space separated, see http://www.aprs-is.net/javAPRSFilter.aspx
-//#define CFG_APRS_RAW_BKN    "BX4ACP-2>APZMDM,WIDE1-1:=2445.84NL12058.12E&LoRa 430.64MHz/BW125/SF12/CR8/0x12"
 
 // APRS-IS gateway options, valid when CFG_IS_CLIENT_MODE = false
-#define CFG_SIGNAL_REPORT     false    // include signal report into the comment when sending to APRS-IS
+#define CFG_SIGNAL_REPORT     true    // include signal report into the comment when sending to APRS-IS
 #define CFG_PERSISTENT_APRS   true    // keep tcp/ip connection open (lot of traffic), otherwise connect on new packet (very rare traffic)
 #define CFG_DIGIREPEAT        false   // digirepeat incoming packets
 #define CFG_RF_TO_IS          true    // forward packets from radio to internet

@@ -1,6 +1,12 @@
 #include <arduino-timer.h>
 #include <DebugLog.h>
 #include "WiFi.h"
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
+#include <AsyncElegantOTA.h>
+
+const char* ssid = "GabeAP";
+const char* password = "22433897";
 
 #include "loraprs_service.h"
 
@@ -64,8 +70,8 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.UsbSerialEnable = CFG_USB_SERIAL_ENABLE;
 
   // bluetooth device name
-  cfg.BtName = CFG_BT_NAME;
-  cfg.BtEnableBle = CFG_BT_USE_BLE;
+ // cfg.BtName = CFG_BT_NAME;
+ // cfg.BtEnableBle = CFG_BT_USE_BLE;
 
   // server mode wifi paramaters
   cfg.WifiEnableAp = CFG_WIFI_ENABLE_AP;
@@ -99,12 +105,34 @@ void initializeConfig(LoraPrs::Config &cfg) {
 LoraPrs::Service loraPrsService;
 
 auto watchdogLedTimer = timer_create_default();
-
+AsyncWebServer server(80);
 void setup() {
   pinMode(BUILTIN_LED, OUTPUT);
   digitalWrite(BUILTIN_LED, 1);
+  Serial.begin(115200);
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  Serial.println("");
 
-  Serial.begin(SERIAL_BAUD_RATE);
+  // Wait for connection
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.print("Connected to ");
+  Serial.println(ssid);
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(200, "text/plain", "Hi! I am ESP32.");
+  });
+
+  AsyncElegantOTA.begin(&server);    // Start ElegantOTA
+  server.begin();
+  Serial.println("HTTP server started");
+  //Serial.begin(SERIAL_BAUD_RATE);
   while (!Serial);
   
   LoraPrs::Config config;
