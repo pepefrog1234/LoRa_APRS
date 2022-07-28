@@ -4,9 +4,9 @@
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <AsyncElegantOTA.h>
-
-const char* ssid = "GabeAP";
-const char* password = "22433897";
+//WI-FI名稱密碼
+const char* ssid = "";
+const char* password = "";
 
 #include "loraprs_service.h"
 
