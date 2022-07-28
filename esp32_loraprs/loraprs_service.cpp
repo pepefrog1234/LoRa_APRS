@@ -1,9 +1,9 @@
 #include "loraprs_service.h"
 
 namespace LoraPrs {
-int ERR_NONE=0;
-byte Service::rxBuf_[CfgMaxPacketSize];
 
+byte Service::rxBuf_[CfgMaxPacketSize];
+int ERR_NONE=0;
 #ifdef USE_RADIOLIB
 #pragma message("Using RadioLib")
 volatile bool Service::loraDataAvailable_ = false;
@@ -404,7 +404,6 @@ ICACHE_RAM_ATTR void Service::onLoraDataAvailableIsr() {
     if (packetSize > 0) {
       
       int state = radio_->readData(rxBuf_, packetSize);
-      int ERR_NONE;
       if (state == ERR_NONE) {
         queueRigToSerialIsr(Cmd::Data, rxBuf_, packetSize);
       } else {
@@ -412,7 +411,6 @@ ICACHE_RAM_ATTR void Service::onLoraDataAvailableIsr() {
       }
       
       state = radio_->startReceive();
-      //int ERR_NONE;
       if (state != ERR_NONE) {
         LOG_ERROR("Start receive error: ", state);
       }
@@ -430,13 +428,12 @@ void Service::processIncomingDataTask(void *param) {
       if (packetSize > 0) {
     
         int state = radio_->readData(rxBuf_, packetSize);
-        int ERR_NONE;
         if (state == ERR_NONE) {
           queueRigToSerialIsr(Cmd::Data, rxBuf_, packetSize);
         } else {
           LOG_ERROR("Read data error: ", state);
         }
-        //int ERR_NONE;
+    
         state = radio_->startReceive();
         if (state != ERR_NONE) {
           LOG_ERROR("Start receive error: ", state);
@@ -596,7 +593,6 @@ void Service::performFrequencyCorrection() {
 void Service::setupFreq(long loraFreq) const {
   #ifdef USE_RADIOLIB
     radio_->setFrequency((float)config_.LoraFreqRx / 1e6);
-    //int ERR_NONE;
     int state = radio_->startReceive();
     if (state != ERR_NONE) {
       LOG_ERROR("Start receive error:", state);
@@ -652,14 +648,14 @@ void Service::processIncomingRawPacketAsServer(const byte *packet, int packetLen
     float snr = LoRa.packetSnr();
     int rssi = LoRa.packetRssi();
     long frequencyError = LoRa.packetFrequencyError();
-#endif //訊號報告修改
-    String signalReport = String(" ") + 
-      String("(RSSI: ") +
+#endif
+    String signalReport = String(" ") +
+      String("rssi: ") +
       String(snr < 0 ? rssi + snr : rssi) +
       String("dBm, ") +
-      String("SNR: ") +
+      String("snr: ") +
       String(snr) +
-      String("dB)");
+      String("dB");
     if (frequencyError != 0) {
       signalReport += String(", err: ") +
       String(frequencyError) +
@@ -719,7 +715,7 @@ void Service::onRigTxEnd()
   for (int i = 0; i < txPacketSize; i++) {
     txBuf[i] = txQueue_.shift();
   }
-  //int ERR_NONE;
+
   interruptEnabled_ = false;
   int state = radio_->transmit(txBuf, txPacketSize);
   if (state != ERR_NONE) {

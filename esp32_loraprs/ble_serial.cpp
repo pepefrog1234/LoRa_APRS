@@ -1,17 +1,3 @@
-// Copyright 2019 Ian Archbell / oddWires
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 #include "ble_serial.h"
 
 class BLESerialServerCallbacks: public BLEServerCallbacks {
@@ -20,12 +6,13 @@ class BLESerialServerCallbacks: public BLEServerCallbacks {
     
     void onConnect(BLEServer* pServer) {
         // do anything needed on connection
+        LOG_INFO("BLE client connected");
         delay(1000); // wait for connection to complete or messages can be lost
     };
 
     void onDisconnect(BLEServer* pServer) {
         pServer->startAdvertising(); // restart advertising
-        LOG_INFO("Started advertising");
+        LOG_INFO("BLE client disconnected, started advertising");
     }
 };
 
@@ -92,18 +79,21 @@ bool BLESerial::begin(const char* localName)
     if (pRxCharacteristic == nullptr)
         return false; 
 
-    BLESerialCharacteristicCallbacks* bleSerialCharacteristicCallbacks =  new BLESerialCharacteristicCallbacks(); 
+    BLESerialCharacteristicCallbacks* bleSerialCharacteristicCallbacks = new BLESerialCharacteristicCallbacks(); 
     bleSerialCharacteristicCallbacks->bleSerial = this;  
     pRxCharacteristic->setCallbacks(bleSerialCharacteristicCallbacks);
 
     // Start the service
     pService->start();
-    LOG_INFO("starting service");
+    LOG_INFO("BLE starting service");
 
     // Start advertising
     pServer->getAdvertising()->addServiceUUID(pService->getUUID()); 
+    pServer->getAdvertising()->setScanResponse(true);
+    pServer->getAdvertising()->setMinPreferred(0x06);
+    pServer->getAdvertising()->setMaxPreferred(0x12);
     pServer->getAdvertising()->start();
-    LOG_INFO("Waiting a client connection to notify...");
+    LOG_INFO("BLE is waiting a client connection to notify...");
     return true;
 }
 
@@ -152,7 +142,7 @@ size_t BLESerial::write(uint8_t c)
     uint8_t _c = c;
     pTxCharacteristic->setValue(&_c, 1);
     pTxCharacteristic->notify();
-    delay(10); // bluetooth stack will go into congestion, if too many packets are sent
+    delay(3); // bluetooth stack will go into congestion, if too many packets are sent
     return 1;
 }
 

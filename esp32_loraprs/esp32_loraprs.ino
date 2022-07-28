@@ -52,13 +52,13 @@ void initializeConfig(LoraPrs::Config &cfg) {
   cfg.LoraUseCad = CFG_LORA_USE_CAD;  // carrier detect
 
   // aprs configuration
-  cfg.AprsHost = "aprsc.tmmarc.org";
+  cfg.AprsHost = "rotate.aprs2.net";
   cfg.AprsPort = 14580;
   cfg.AprsLogin = CFG_APRS_LOGIN;
   cfg.AprsPass = CFG_APRS_PASS;
   cfg.AprsFilter = CFG_APRS_FILTER; // multiple filters are space separated
   cfg.AprsRawBeacon = CFG_APRS_RAW_BKN;
-  cfg.AprsRawBeaconPeriodMinutes = 10;
+  cfg.AprsRawBeaconPeriodMinutes = 20;
 
   // USB
   cfg.UsbSerialEnable = CFG_USB_SERIAL_ENABLE;
